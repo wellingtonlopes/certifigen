@@ -1,7 +1,7 @@
 import './App.css';
 import { Box, Button, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Description } from '@material-ui/icons'
 
 
@@ -15,7 +15,36 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
+  const [ name, setName ] = useState("");
+  const [ course, setCourse ] = useState("");
   const classes = useStyles();
+
+  const generateCertificate = async () => {
+    if (name && course !== "") {
+      const response = await fetch('http://localhost:3001/certificado', {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          data: {
+            name: name,
+            course: course
+          }
+        })  
+      });
+      const data = await response.json();
+      console.log("front", data);
+    }
+  };
+
+  async function fetchData() {
+    const response = await fetch('http://localhost:3001/')
+    const data = await response.json();
+    console.log(data);
+  }
+
+  useEffect(() => {
+    fetchData();
+  });
 
   return (
     <Fragment>
@@ -49,6 +78,7 @@ function App() {
             variant="outlined"
             style={{ width: "80%" }}
             margin="normal"
+            onChange={(event) => setName(event.target.value)}
           />
           <TextField
             required
@@ -58,6 +88,7 @@ function App() {
             variant="outlined"
             style={{ width: "80%" }}
             margin="normal"
+            onChange={(event) => setCourse(event.target.value)}
           />
           <Grid item
             style={{ marginTop: 25 }}>
@@ -66,6 +97,7 @@ function App() {
               color="primary"
               variant="contained"
               startIcon={<Description />}
+              onClick={generateCertificate}
             > Gerar Certificado</Button>
           </Grid>
         </Grid>
